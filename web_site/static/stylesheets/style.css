@@ -1,0 +1,158 @@
+* {
+    box-sizing: border-box;
+
+}
+
+body {
+    background: linear-gradient(150.89deg, #99c3ea, #FD8469);
+    background-attachment: fixed;
+    margin: 0px;
+    padding: 0px;
+    height: 100%;
+}
+
+
+
+#therm_temp{
+    display: none;
+}
+
+.header {
+    padding: 10px;
+    text-align: center;
+    width: 100%;
+    color: white;
+    font-family: "Russo One";
+}
+#footer {
+    position: relative;
+    text-align: center;
+    width: 100%;
+    color: black;
+}
+
+#usage-title {
+    color: black;
+    font-family: "Russo One";
+
+}
+
+
+.header h1 {
+    font-size: 48px;
+    color: white;
+    
+}
+
+
+.card{
+    border-radius: 1rem;
+}
+
+
+.navbar-nav {
+    
+    font-family: "Russo One";
+    position: relative;
+ 
+}
+
+/* 
+Hover animations for nav bar
+*/
+
+li a::after{
+    content:'';
+    position: absolute;
+    display: block;
+    height: 0.4em;
+    width: 0%;
+    background-color: #99c3ea;
+    transition: all ease-in-out 270ms;
+}
+
+li a:hover::after{
+    width: 30%;
+    
+}
+
+
+
+
+
+
+#index {
+    width: 330px;
+
+}
+
+
+#indexPage {
+    position: relative;
+    left: 10%;
+    right: 10%;
+    text-align: center;
+    max-width: 80%;
+}
+
+.card-title{
+    color: white;
+    font-family: "Russo One";
+}
+
+.row1{
+    display:flex;
+    flex-direction: row;
+    font-family: "Russo One";
+}
+
+.col2{
+    display:flex;
+    flex-direction: column;
+    
+}
+
+
+
+/*
+    Landing Page, Browse Products, Veiw Products
+*/
+
+
+
+.row{
+    font-family: "Russo One";
+}
+
+.card-text{
+    font-family: "Russo One";
+}
+
+
+/* 
+Page transitions
+*/
+
+body{
+    animation: transitionIn 0.85s;
+}
+
+
+@keyframes transitionIn {
+    from{
+        opacity: 0;
+        transform: rotateX(-10deg);
+    }
+
+    to{
+        opacity: 1;
+        transform: rotateX(0);
+    }
+}
+
+svg {
+    width: 100%;
+    height: auto;
+}
+
+

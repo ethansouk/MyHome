@@ -1,0 +1,2198 @@
+{% extends 'layout.html' %} {% block body %}
+<div id="indexPage">
+    <br>
+    <style>
+        #Thurm {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+        }
+
+        #Thurm .btn{
+            padding: 2px;
+            width: 25px;
+            margin-left: 16px;
+            margin-bottom: 1px;
+        }
+
+        #Thurm .card {
+            color: black;
+            background-color: rgba(255,255,255, 0.3);
+            box-shadow: 0 4px 20px rgba(255, 255, 255, 0.25) inset, 0 4px 20px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(50px);
+            display: inline-block;
+            border-radius: 1rem
+        }
+        .rounded {
+            border-radius: 1rem !important;
+        }
+        .btn{
+            background-color: #FD8469;
+            color: white;
+        }
+        .btn:hover{
+            background-color: #ddd;
+            color: black;
+            
+        }
+    </style>
+    <div id = "Thurm">
+        <div class="card shadow-sm">
+            <div class="card-body" >
+                <h4 class="card-title">Current House Temperature</h4>
+                <p class="card-text" id ="int_reading">{% if data.temp.inside %}{{ data.temp.inside }} F{% else %}--{% endif %}</p>
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h4 class="card-title">Current Exterior Temperature</h4>
+                <p class="card-text" >{% if data.temp.outside %}{{ data.temp.outside }} F{% else %}--{% endif %}</p>
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="row1">
+                    <div class="col1">
+                        <h4 class="card-title">Thermostat</h4>
+                        <p  id="therm_temp">{{data.temp.thermostat}}</p>
+                        <p class="card-text" id ="therm_reading">Set Temp: {{data.temp.thermostat}} F</p>
+                    </div>
+                    <div class="col2">
+                        <button class="btn" onclick="increase()">+</button>
+                        <button class="btn" onclick="decrease()">-</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function increase() {
+            var y = document.getElementById("therm_reading");
+            var text = y.innerHTML;
+            const a = text.split(" ");
+            var b = parseInt(a[a.length-2]);
+            console.log(b);
+            b = b + 1;
+            y.innerHTML = "Set Temp: " + b + " F";
+            var therm_temp = document.getElementById("therm_temp");
+            therm_temp.innerHTML = b;
+
+            inner = document.getElementById('int_reading')
+            therm = document.getElementById('therm_temp')
+            
+            
+            console.log(parseInt(inner.textContent))
+            console.log(parseInt(therm.textContent))
+            //heating
+            if ( parseInt(inner.textContent) < parseInt(therm.textContent)) {
+                document.body.style.background = 'linear-gradient(150.89deg, #FD8469, #FD8469)'
+                document.body.style.backgroundAttachment = "fixed"
+            }
+            //cooling
+            else if(parseInt(inner.textContent) > parseInt(therm.textContent)) {
+               document.body.style.background = 'linear-gradient(150.89deg, #99c3ea, #99c3ea)'
+                document.body.style.backgroundAttachment = "fixed"
+            }
+            //set 
+            else{
+                document.body.style.background = 'linear-gradient(150.89deg, #99c3ea, #FD8469)'
+                document.body.style.backgroundAttachment = "fixed"
+            } 
+            (async () => {
+                var retval = await fetch('/api/thermostat_increase?id=' + "thermostat");  
+                var obj = await retval.json();  
+                console.log(obj);
+                }
+            )();
+
+        }
+        function decrease() {
+            var y = document.getElementById("therm_reading");
+            var text = y.innerHTML;
+            const a = text.split(" ");
+            var b = parseInt(a[a.length-2]);
+            console.log(b);
+            b = b - 1;
+            y.innerHTML = "Set Temp: " + b + " F";
+            var therm_temp = document.getElementById("therm_temp");
+            therm_temp.innerHTML = b;
+
+
+            inner = document.getElementById('int_reading')
+            therm = document.getElementById('therm_temp')
+
+            console.log(parseInt(inner.textContent))
+            console.log(parseInt(therm.textContent))
+            
+            //heating
+            if ( parseInt(inner.textContent) < parseInt(therm.textContent)) {
+                document.body.style.background = 'linear-gradient(150.89deg, #FD8469, #FD8469)'
+                document.body.style.backgroundAttachment = "fixed"
+            }
+            //cooling
+            else if(parseInt(inner.textContent) > parseInt(therm.textContent)) {
+               document.body.style.background = 'linear-gradient(150.89deg, #99c3ea, #99c3ea)'
+                document.body.style.backgroundAttachment = "fixed"
+            }
+            //set 
+            else{
+                document.body.style.background = 'linear-gradient(150.89deg, #99c3ea, #FD8469)'
+                document.body.style.backgroundAttachment = "fixed"
+            } 
+
+            (async () => {
+                var retval = await fetch('/api/thermostat_decrease?id=' + "thermostat");  
+                var obj = await retval.json();  
+                console.log(obj);
+                }
+            )();
+
+        }
+
+    </script>
+  
+    <div class="row">
+
+        <div class="col-md-8 offset-md-2">
+            <div class="card" style="height: 30rem; background-color: rgba(255,255,255, 0.3); margin-top: 8px;
+                                    box-shadow: 0 4px 20px rgba(255, 255, 255, 0.25) inset, 0 4px 20px rgba(0, 0, 0, 0.2);
+                                    border-radius: 1rem; backdrop-filter: blur(50px); ">
+                <div class="card-body">
+                    <h2 class="h4 card-title">House Layout</h2>
+                    <div class="svg-container">
+                        <svg width="100%" height="100%" viewBox="0 0 700 700">
+                            <rect id="garagebay_1" name = "Garage Bay 1" x="0" y="0" width="75" height="150" fill="white" stroke="black" stroke-width="3" />
+                            <rect id="garagedoor_1" name = "Garage Door 1" x="15" y="150" width="50" height="5" fill="white" stroke="black" stroke-width="3" />
+                            <rect id="garagebay_2" name = "Garage Bay 2" x="75" y="0" width="75" height="150" fill="white"  stroke="black" stroke-width="3" />
+                            <rect id="garagedoor_2" name = "Garage Door 2" x="90" y="150" width="50" height="5" fill="white"  stroke="black" stroke-width="3"/>
+                            <rect x="150" y="0" width="500" height="300" fill="white" stroke="black" stroke-width="3" />
+                            <rect id="washer" name = "Washer" x="100" y="0" width="20" height="20" fill="white"  stroke="black" stroke-width="3"/>
+                            <rect id="dryer" name = "Dryer" x="120" y="0" width="20" height="20" fill="white"  stroke="black" stroke-width="3" />
+                            <rect id="kitchen" name = "Kitchen" x="150" y="0" width="200" height="100" fill="white"  stroke="black" stroke-width="3" />
+                            <rect id="garagedoor" name = "Exterior to Garage" x="148" y="20" width="5" height="20" fill="white"  stroke="black" stroke-width="3"/>
+                            <rect id="backdoor" name = "Backdoor" x="165" y="0" width="20" height="5" fill="white"  stroke="black" stroke-width="3"/>
+                            <rect id="kitchen_win_1" name = "Kitchen Window 1" x="205" y="0" width="30" height="5" fill="white"  stroke="black" stroke-width="3"/>
+                            <rect id="kitchen_win_2" name = "Kitchen Window 2" x="295" y="0" width="30" height="5" fill="white"  stroke="black" stroke-width="3"/>
+                            <rect id="dishwasher" name = "Dishwasher" x="245" y="0" width="30" height="30" fill="white"  stroke="black" stroke-width="3"/>
+                            <rect id="refrigerator" name = "Refrigerator" x="320" y="25" width="30" height="30" fill="white"  stroke="black" stroke-width="3"/>
+                            <rect id="microwave" name = "Microwave" x="330" y="80" width="10" height="10" fill="white"  stroke="black" stroke-width="3"/>
+                            <rect id="stove" name = "Stove" x="210" y="70" width="30" height="30" fill="white"  stroke="black" stroke-width="3"/>
+                            <rect id="oven" name = "Oven" x="240" y="70" width="30" height="30" fill="white"  stroke="black" stroke-width="3"/>
+                            <rect id="livingroom" name = "Living Room" x="150" y="100" width="200" height="200" fill="white"  stroke="black" stroke-width="3"/>
+                            <rect id="livingroom_win_1" name = "Living Room Window 1" x="148" y="170" width="5" height="40" fill="white"  stroke="black" stroke-width="3"/>
+                            <rect id="livingroom_win_2" name = "Living Room Window 2" x="148" y="230" width="5" height="40" fill="white"  stroke="black" stroke-width="3"/>
+                            <rect id="livingroom_win_3" name = "Living Room Window 3" x="152" y="300" width="40" height="5" fill="white"  stroke="black" stroke-width="3"/>
+                            <rect id="front_door" name = "Front Door" x="232" y="300" width="30" height="5" fill="white"  stroke="black" stroke-width="3"/>
+                            <rect id="living_lamp_1" name = "Living Room Lamp 1" x="150" y="100" width="20" height="20" fill="white"  stroke="black" stroke-width="3"/>
+                            <rect id="living_lamp_2" name = "Living Room Lamp 2" x="330" y="200" width="20" height="20" fill="white"  stroke="black" stroke-width="3"/>
+                            <rect id="living_tv" name = "Living Room TV" x="300" y="120" width="5" height="50" fill="white"  stroke="black" stroke-width="3"/>
+                            <rect id="bathroom_1" name = "Master Bathroom" x="270" y="220" width="80" height="80" fill="white"  stroke="black" stroke-width="3"/>
+                            <rect id="bathroom_1_window" name = "Master Bathroom Window" x="290" y="300" width="40" height="5" fill="white"  stroke="black" stroke-width="3"/>
+                            <image id="bathroom_1_fan" name = "Master Bathroom Fan" x="290" y="250" width="20" height="20" href="/static/images/fan.svg" />
+                            <rect id="Hallway" name = "Hallway" x="350" y="100" width="300" height="30" fill="white"  stroke="black" stroke-width="3"/>
+                            <rect id="bedroom_1" name = "Bedroom 1" x="350" y="0" width="125" height="100" fill="white"  stroke="black" stroke-width="3"/>
+                            <rect id="bathroom_2" name = "Second Bathroom" x="475" y="0" width="40" height="100" fill="white"  stroke="black" stroke-width="3"/>
+                            <rect id="bedroom_2" name = "Bedroom 2" x="515" y="0" width="135" height="100" fill="white"  stroke="black" stroke-width="3"/>
+                            <image id="bathroom_2_fan" name = "Bathroom 2 Fan" x="485" y="40" width="20" height="20" href="/static/images/fan.svg"  />
+                            <rect id="bathroom_2_window" name = "Bathroom 2 window" x="485" y="0" width="20" height="5" fill="white"  stroke="black" stroke-width="3"/>
+                            <rect id="bedroom_1_window_1" name = "Bedroom 1 Window 1" x="385" y="0" width="25" height="5" fill="white"  stroke="black" stroke-width="3"/>
+                            <rect id="bedroom_1_window_2" name = "Bedroom 1 Window 2" x="425" y="0" width="25" height="5" fill="white"  stroke="black" stroke-width="3"/>
+                            <rect id="bedroom_1_lamp_1" name = "Bedroom 1 Lamp 1" x="350" y="0" width="20" height="20" fill="white"  stroke="black" stroke-width="3"/>
+                            <rect id="bedroom_1_lamp_2" name = "Bedroom 1 Lamp 2" x="455" y="80" width="20" height="20" fill="white"  stroke="black" stroke-width="3"/>
+                            <rect id="bedroom_2_window_1" name = "Bedroom 2 Window 1" x="545" y="0" width="25" height="5" fill="white"  stroke="black" stroke-width="3"/>
+                            <rect id="bedroom_2_window_2" name = "Bedroom 2 Window 2" x="585" y="0" width="25" height="5" fill="white"  stroke="black" stroke-width="3"/>
+                            <rect id="bedroom_2_lamp_1" name = "Bedroom 2 Lamp 1" x="515" y="0" width="20" height="20" fill="white"  stroke="black" stroke-width="3"/>
+                            <rect id="bedroom_2_lamp_2" name = "Bedroom 2 Lamp 2" x="630" y="80" width="20" height="20" fill="white"  stroke="black" stroke-width="3"/>
+                            <rect id="master_bedroom" name = "Master Bedroom" x="350" y="130" width="300" height="170" fill="white"  stroke="black" stroke-width="3"/>
+                            <rect id="master_bedroom_window_1" name = "Master Bedroom Window 1" x="425" y="300" width="60" height="5" fill="white"  stroke="black" stroke-width="3"/>
+                            <rect id="master_bedroom_window_2" name = "Master Bedroom Window 2" x="525" y="300" width="60" height="5" fill="white"  stroke="black" stroke-width="3"/>
+                            <rect id="master_bedroom_lamp_1" name = "Master Bedroom Lamp 1" x="350" y="130" width="20" height="20" fill="white"  stroke="black" stroke-width="3"/>
+                            <rect id="master_bedroom_lamp_2" name = "Master Bedroom Lamp 2" x="630" y="130" width="20" height="20" fill="white"  stroke="black" stroke-width="3"/>
+                            <rect id="master_bedroom_tv" name = "Master Bedroom TV" x="465" y="145" width="80" height="5" fill="white"  stroke="black" stroke-width="3"/>
+                        </svg>
+                    </div>
+
+
+                    <script>
+                        $(document).ready(function(){
+                            $("#front_door_button").click(function(){
+                                var door = document.getElementById("front_door");
+                                var x = door.getAttribute('x');
+                                var y = door.getAttribute('y');
+                                var transform = door.getAttribute('transform');
+                                var color = door.getAttribute('fill');
+                                
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + door.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "open") {
+                                        door.setAttribute("fill","#99c3ea");
+                                        door.setAttribute("transform", "rotate(90 " + x +',' + y + ") scale(1)");
+                                    }else{
+                                        door.setAttribute("fill","white");
+                                        door.setAttribute("transform", "rotate(0,0,0) scale(1)");
+                                    }
+                                })();
+                            });
+                            $("#front_door").click(function(){
+                                var door = document.getElementById("front_door");
+                                var x = door.getAttribute('x');
+                                var y = door.getAttribute('y');
+                                var transform = door.getAttribute('transform');
+                                var color = door.getAttribute('fill');
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + door.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "open") {
+                                        door.setAttribute("fill","#99c3ea");
+                                        door.setAttribute("transform", "rotate(90 " + x +',' + y + ") scale(1)");
+                                    }else{
+                                        door.setAttribute("fill","white");
+                                        door.setAttribute("transform", "rotate(0,0,0) scale(1)");
+                                    }
+                                })();
+                            });
+                            $("#living_tv").click(function(){
+                                var tv = document.getElementById("living_tv");
+                                var color = tv.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + tv.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "on") {
+                                        tv.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        tv.setAttribute("fill","white");
+                                    }
+                                })();
+                                
+                            });
+                            //living tv button
+                            $("#living_tv_button").click(function(){
+                                var tv = document.getElementById("living_tv");
+                                var color = tv.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + tv.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "on") {
+                                        tv.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        tv.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+
+                            $("#living_lamp_1").click(function(){
+                                var lamp = document.getElementById("living_lamp_1");
+                                var color = lamp.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + lamp.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "on") {
+                                        lamp.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        lamp.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+                            //living lamp1 button3
+                            $("#living_lamp1_button").click(function(){
+                                var lamp = document.getElementById("living_lamp_1");
+                                var color = lamp.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + lamp.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "on") {
+                                        lamp.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        lamp.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+
+                            $("#living_lamp_2").click(function(){
+                                var lamp = document.getElementById("living_lamp_2");
+                                var color = lamp.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + lamp.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "on") {
+                                        lamp.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        lamp.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+                            //living lamp2 button
+                            $("#living_lamp2_button").click(function(){
+                                var lamp = document.getElementById("living_lamp_2");
+                                var color = lamp.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + lamp.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "on") {
+                                        lamp.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        lamp.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+
+                            $("#livingroom_win_1").click(function(){
+                                var win = document.getElementById("livingroom_win_1");
+                                var color = win.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + win.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "open") {
+                                        win.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        win.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+                            //livingroom win1 button
+                            $("#living_win1_button").click(function(){
+                                var win = document.getElementById("livingroom_win_1");
+                                var color = win.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + win.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "open") {
+                                        win.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        win.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+
+                            $("#livingroom_win_2").click(function(){
+                                var win = document.getElementById("livingroom_win_2");
+                                var color = win.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + win.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "open") {
+                                        win.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        win.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+                            //livingroom win2 button
+                            $("#living_win2_button").click(function(){
+                                var win = document.getElementById("livingroom_win_2");
+                                var color = win.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + win.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "open") {
+                                        win.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        win.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+
+                            //living Room
+                            $("#livingroom").click(function(){
+                                var win = document.getElementById("livingroom");
+                                var color = win.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + win.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "on") {
+                                        win.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        win.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+                            //living room light button
+                            $("#living_light_button").click(function(){
+                                var win = document.getElementById("livingroom");
+                                var color = win.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + win.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "on") {
+                                        win.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        win.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+                            //window 3
+                            $("#livingroom_win_3").click(function(){
+                                var win = document.getElementById("livingroom_win_3");
+                                var color = win.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + win.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "open") {
+                                        win.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        win.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+                            //livingroom win3 button
+                            $("#living_win3_button").click(function(){
+                                var win = document.getElementById("livingroom_win_3");
+                                var color = win.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + win.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "open") {
+                                        win.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        win.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+
+                            //backdoor
+                            $("#backdoor").click(function(){
+                                var door = document.getElementById("backdoor");
+                                var x = door.getAttribute('x');
+                                var y = door.getAttribute('y');
+                                var transform = door.getAttribute('transform');
+                                var color = door.getAttribute('fill');
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + door.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "open") {
+                                        door.setAttribute("fill","#99c3ea");
+                                        door.setAttribute("transform", "rotate(90 " + x +',' + y + ") scale(1)");
+                                    }else{
+                                        door.setAttribute("fill","white");
+                                        door.setAttribute("transform", "rotate(0,0,0) scale(1)");
+                                    }
+                                })();
+                            });
+
+                            //backdoor button
+                            $("#backdoor_button").click(function(){
+                                var door = document.getElementById("backdoor");
+                                var x = door.getAttribute('x');
+                                var y = door.getAttribute('y');
+                                var transform = door.getAttribute('transform');
+                                var color = door.getAttribute('fill');
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + door.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "open") {
+                                        door.setAttribute("fill","#99c3ea");
+                                        door.setAttribute("transform", "rotate(90 " + x +',' + y + ") scale(1)");
+                                    }else{
+                                        door.setAttribute("fill","white");
+                                        door.setAttribute("transform", "rotate(0,0,0) scale(1)");
+                                    }
+                                })();
+                            });
+
+                            //garagedoor
+                            $("#garagedoor").click(function(){
+                                var door = document.getElementById("garagedoor");
+                                var x = door.getAttribute('x');
+                                var y = door.getAttribute('y');
+                                var transform = door.getAttribute('transform');
+                                var color = door.getAttribute('fill');
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + door.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "open") {
+                                        door.setAttribute("fill","#99c3ea");
+                                        door.setAttribute("transform", "rotate(90 " + x +',' + y + ") scale(1)");
+                                    }else{
+                                        door.setAttribute("fill","white");
+                                        door.setAttribute("transform", "rotate(0,0,0) scale(1)");
+                                    }
+                                })();
+                            });
+                            //garagedoor button
+                            $("#garage_door_button").click(function(){
+                                var door = document.getElementById("garagedoor");
+                                var x = door.getAttribute('x');
+                                var y = door.getAttribute('y');
+                                var transform = door.getAttribute('transform');
+                                var color = door.getAttribute('fill');
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + door.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "open") {
+                                        door.setAttribute("fill","#99c3ea");
+                                        door.setAttribute("transform", "rotate(90 " + x +',' + y + ") scale(1)");
+                                    }else{
+                                        door.setAttribute("fill","white");
+                                        door.setAttribute("transform", "rotate(0,0,0) scale(1)");
+                                    }
+                                })();
+                            });
+
+                            //washer
+                            $("#washer").click(function(){
+                                var washer = document.getElementById("washer");
+                                var color = washer.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + washer.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "on") {
+                                        washer.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        washer.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+                            //washer button
+                            $("#washer_button").click(function(){
+                                var washer = document.getElementById("washer");
+                                var color = washer.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + washer.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "on") {
+                                        washer.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        washer.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+
+                            //dryer
+                            $("#dryer").click(function(){
+                                var dryer = document.getElementById("dryer");
+                                var color = dryer.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + dryer.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "on") {
+                                        dryer.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        dryer.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+                            //dryer button
+                            $("#dryer_button").click(function(){
+                                var dryer = document.getElementById("dryer");
+                                var color = dryer.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + dryer.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "on") {
+                                        dryer.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        dryer.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+
+                            //garage bay 1
+                            $("#garagebay_1").click(function(){
+                                var bay = document.getElementById("garagebay_1");
+                                var color = bay.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + bay.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "on") {
+                                        bay.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        bay.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+                            //garage bay 1 button
+                            $("#garage_bay_1_button").click(function(){
+                                var bay = document.getElementById("garagebay_1");
+                                var color = bay.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + bay.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "on") {
+                                        bay.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        bay.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+
+                            //garage bay 2
+                            $("#garagebay_2").click(function(){
+                                var bay = document.getElementById("garagebay_2");
+                                var color = bay.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + bay.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "on") {
+                                        bay.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        bay.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+                            //garage bay 2 button
+                            $("#garage_bay_2_button").click(function(){
+                                var bay = document.getElementById("garagebay_2");
+                                var color = bay.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + bay.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "on") {
+                                        bay.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        bay.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+
+                            //garage door 1
+                            $("#garagedoor_1").click(function(){
+                                var door = document.getElementById("garagedoor_1");
+                                var x = door.getAttribute('x');
+                                var y = door.getAttribute('y');
+                                var transform = door.getAttribute('transform');
+                                var color = door.getAttribute('fill');
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + door.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "open") {
+                                        door.setAttribute("fill","#99c3ea");
+                                        door.setAttribute("transform", "rotate(90 " + x +',' + y + ") scale(1)");
+                                    }else{
+                                        door.setAttribute("fill","white");
+                                        door.setAttribute("transform", "rotate(0,0,0) scale(1)");
+                                    }
+                                })();
+                            });
+                            //garage door 1 button
+                            $("#garage_door_1_button").click(function(){
+                                var door = document.getElementById("garagedoor_1");
+                                var x = door.getAttribute('x');
+                                var y = door.getAttribute('y');
+                                var transform = door.getAttribute('transform');
+                                var color = door.getAttribute('fill');
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + door.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "open") {
+                                        door.setAttribute("fill","#99c3ea");
+                                        door.setAttribute("transform", "rotate(90 " + x +',' + y + ") scale(1)");
+                                    }else{
+                                        door.setAttribute("fill","white");
+                                        door.setAttribute("transform", "rotate(0,0,0) scale(1)");
+                                    }
+                                })();
+                            });
+
+                            //garage door 2
+                            $("#garagedoor_2").click(function(){
+                                var door = document.getElementById("garagedoor_2");
+                                var x = door.getAttribute('x');
+                                var y = door.getAttribute('y');
+                                var transform = door.getAttribute('transform');
+                                var color = door.getAttribute('fill');
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + door.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "open") {
+                                        door.setAttribute("fill","#99c3ea");
+                                        door.setAttribute("transform", "rotate(90 " + x +',' + y + ") scale(1)");
+                                    }else{
+                                        door.setAttribute("fill","white");
+                                        door.setAttribute("transform", "rotate(0,0,0) scale(1)");
+                                    }
+                                })();
+                            });
+                            //garage door 2 button
+                            $("#garage_door_2_button").click(function(){
+                                var door = document.getElementById("garagedoor_2");
+                                var x = door.getAttribute('x');
+                                var y = door.getAttribute('y');
+                                var transform = door.getAttribute('transform');
+                                var color = door.getAttribute('fill');
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + door.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "open") {
+                                        door.setAttribute("fill","#99c3ea");
+                                        door.setAttribute("transform", "rotate(90 " + x +',' + y + ") scale(1)");
+                                    }else{
+                                        door.setAttribute("fill","white");
+                                        door.setAttribute("transform", "rotate(0,0,0) scale(1)");
+                                    }
+                                })();
+                            });
+
+                            //kitchen
+                            $("#kitchen").click(function(){
+                                var kitchen = document.getElementById("kitchen");
+                                var color = kitchen.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + kitchen.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "on") {
+                                        kitchen.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        kitchen.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+                            //kitchen button
+                            $("#kitchen_button").click(function(){
+                                var kitchen = document.getElementById("kitchen");
+                                var color = kitchen.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + kitchen.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "on") {
+                                        kitchen.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        kitchen.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+
+                            //master bathroom
+                            $("#bathroom_1").click(function(){
+                                var bathroom = document.getElementById("bathroom_1");
+                                var color = bathroom.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + bathroom.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "on") {
+                                        bathroom.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        bathroom.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+                            //master bathroom button
+                            $("#bathroom_1_button").click(function(){
+                                var bathroom = document.getElementById("bathroom_1");
+                                var color = bathroom.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + bathroom.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "on") {
+                                        bathroom.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        bathroom.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+
+                            //bathroom 1 window
+                            $("#bathroom_1_window").click(function(){
+                                var bathroom = document.getElementById("bathroom_1_window");
+                                var color = bathroom.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + bathroom.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "open") {
+                                        bathroom.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        bathroom.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+                            //bathroom 1 window button
+                            $("#bathroom_1_window_button").click(function(){
+                                var bathroom = document.getElementById("bathroom_1_window");
+                                var color = bathroom.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + bathroom.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "open") {
+                                        bathroom.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        bathroom.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+                            
+                            //bathroom 1 Fan
+                            $("#bathroom_1_fan").click(function(){
+                                var bathroom = document.getElementById("bathroom_1_fan");
+                                var image = bathroom.getAttribute('href');
+                                console.log(image);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + bathroom.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "on") {
+                                        bathroom.setAttribute("href","/static/images/fan_on.svg");
+                                    }else{
+                                        bathroom.setAttribute("href","/static/images/fan.svg");
+                                    }
+                                })();
+                            });
+                            //bathroom 1 Fan button
+                            $("#bathroom_1_fan_button").click(function(){
+                                var bathroom = document.getElementById("bathroom_1_fan");
+                                var image = bathroom.getAttribute('href');
+                                console.log(image);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + bathroom.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "on") {
+                                        bathroom.setAttribute("href","/static/images/fan_on.svg");
+                                    }else{
+                                        bathroom.setAttribute("href","/static/images/fan.svg");
+                                    }
+                                })();
+                            });
+
+                            //dishwahser
+                            $("#dishwasher").click(function(){
+                                var dishwasher = document.getElementById("dishwasher");
+                                var color = dishwasher.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + dishwasher.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "on") {
+                                        dishwasher.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        dishwasher.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+                            //dishwasher button
+                            $("#dishwasher_button").click(function(){
+                                var dishwasher = document.getElementById("dishwasher");
+                                var color = dishwasher.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + dishwasher.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "on") {
+                                        dishwasher.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        dishwasher.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+
+                            //refrigerator
+                            $("#refrigerator").click(function(){
+                                var refrigerator = document.getElementById("refrigerator");
+                                var color = refrigerator.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + refrigerator.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "on") {
+                                        refrigerator.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        refrigerator.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+                            //refrigerator button
+                            $("#refrigerator_button").click(function(){
+                                var refrigerator = document.getElementById("refrigerator");
+                                var color = refrigerator.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + refrigerator.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "on") {
+                                        refrigerator.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        refrigerator.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+                            //stove
+                            $("#stove").click(function(){
+                                var stove = document.getElementById("stove");
+                                var color = stove.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + stove.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "on") {
+                                        stove.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        stove.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+                            //stove button
+                            $("#stove_button").click(function(){
+                                var stove = document.getElementById("stove");
+                                var color = stove.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + stove.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "on") {
+                                        stove.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        stove.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+                            //microwave
+                            $("#microwave").click(function(){
+                                var microwave = document.getElementById("microwave");
+                                var color = microwave.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + microwave.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "on") {
+                                        microwave.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        microwave.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+                            //microwave button
+                            $("#microwave_button").click(function(){
+                                var microwave = document.getElementById("microwave");
+                                var color = microwave.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + microwave.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "on") {
+                                        microwave.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        microwave.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+                            //oven
+                            $("#oven").click(function(){
+                                var oven = document.getElementById("oven");
+                                var color = oven.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + oven.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "on") {
+                                        oven.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        oven.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+                            //oven button
+                            $("#oven_button").click(function(){
+                                var oven = document.getElementById("oven");
+                                var color = oven.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + oven.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "on") {
+                                        oven.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        oven.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+                            //kitchen window 1
+                            $("#kitchen_win_1").click(function(){
+                                var window = document.getElementById("kitchen_win_1");
+                                var color = window.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + window.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "open") {
+                                        window.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        window.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+                            //kitchen window 1 button
+                            $("#kitchen_win_1_button").click(function(){
+                                var window = document.getElementById("kitchen_win_1");
+                                var color = window.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + window.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "open") {
+                                        window.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        window.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+
+
+                            //kitchen window 2
+                            $("#kitchen_win_2").click(function(){
+                                var window = document.getElementById("kitchen_win_2");
+                                var color = window.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + window.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "open") {
+                                        window.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        window.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+                            //kitchen window 2 button
+                            $("#kitchen_win_2_button").click(function(){
+                                var window = document.getElementById("kitchen_win_2");
+                                var color = window.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + window.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "open") {
+                                        window.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        window.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+                            //bedroom 1
+                            $("#bedroom_1").click(function(){
+                                var bedroom = document.getElementById("bedroom_1");
+                                var color = bedroom.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + bedroom.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "on") {
+                                        bedroom.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        bedroom.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+                            //bedroom 1 button
+                            $("#bedroom_1_button").click(function(){
+                                var bedroom = document.getElementById("bedroom_1");
+                                var color = bedroom.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + bedroom.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "on") {
+                                        bedroom.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        bedroom.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+                            //bedroom 1 window 1
+                            $("#bedroom_1_window_1").click(function(){
+                                var window = document.getElementById("bedroom_1_window_1");
+                                var color = window.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + window.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "open") {
+                                        window.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        window.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+                            //bedroom 1 window 1 button
+                            $("#bedroom_1_window_1_button").click(function(){
+                                var window = document.getElementById("bedroom_1_window_1");
+                                var color = window.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + window.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "open") {
+                                        window.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        window.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+
+                            //bedroom 1 window 2
+                            $("#bedroom_1_window_2").click(function(){
+                                var window = document.getElementById("bedroom_1_window_2");
+                                var color = window.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + window.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "open") {
+                                        window.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        window.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+                            //bedroom 1 window 2 button
+                            $("#bedroom_1_window_2_button").click(function(){
+                                var window = document.getElementById("bedroom_1_window_2");
+                                var color = window.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + window.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "open") {
+                                        window.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        window.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+
+                            //bedroom 1 lamp 1
+                            $("#bedroom_1_lamp_1").click(function(){
+                                var lamp = document.getElementById("bedroom_1_lamp_1");
+                                var color = lamp.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + lamp.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "on") {
+                                        lamp.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        lamp.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+                            //bedroom 1 lamp 1 button
+                            $("#bedroom_1_lamp_1_button").click(function(){
+                                var lamp = document.getElementById("bedroom_1_lamp_1");
+                                var color = lamp.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + lamp.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "on") {
+                                        lamp.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        lamp.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+
+                            //bedroom 1 lamp 2
+                            $("#bedroom_1_lamp_2").click(function(){
+                                var lamp = document.getElementById("bedroom_1_lamp_2");
+                                var color = lamp.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + lamp.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "on") {
+                                        lamp.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        lamp.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+                            //bedroom 1 lamp 2 button
+                            $("#bedroom_1_lamp_2_button").click(function(){
+                                var lamp = document.getElementById("bedroom_1_lamp_2");
+                                var color = lamp.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + lamp.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "on") {
+                                        lamp.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        lamp.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+
+                            //bedroom 2
+                            $("#bedroom_2").click(function(){
+                                var bedroom = document.getElementById("bedroom_2");
+                                var color = bedroom.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + bedroom.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "on") {
+                                        bedroom.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        bedroom.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+                            //bedroom 2 button
+                            $("#bedroom_2_button").click(function(){
+                                var bedroom = document.getElementById("bedroom_2");
+                                var color = bedroom.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + bedroom.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "on") {
+                                        bedroom.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        bedroom.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+
+                            //bedroom 2 window 1
+                            $("#bedroom_2_window_1").click(function(){
+                                var window = document.getElementById("bedroom_2_window_1");
+                                var color = window.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + window.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "open") {
+                                        window.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        window.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+                            //bedroom 2 window 1 button
+                            $("#bedroom_2_window_1_button").click(function(){
+                                var window = document.getElementById("bedroom_2_window_1");
+                                var color = window.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + window.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "open") {
+                                        window.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        window.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+
+                            //bedroom 2 window 2
+                            $("#bedroom_2_window_2").click(function(){
+                                var window = document.getElementById("bedroom_2_window_2");
+                                var color = window.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + window.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "open") {
+                                        window.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        window.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+                            //bedroom 2 window 2 button
+                            $("#bedroom_2_window_2_button").click(function(){
+                                var window = document.getElementById("bedroom_2_window_2");
+                                var color = window.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + window.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "open") {
+                                        window.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        window.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+                            //bedroom 2 lamp 1
+                            $("#bedroom_2_lamp_1").click(function(){
+                                var lamp = document.getElementById("bedroom_2_lamp_1");
+                                var color = lamp.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + lamp.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "on") {
+                                        lamp.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        lamp.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+                            //bedroom 2 lamp 1 button
+                            $("#bedroom_2_lamp_1_button").click(function(){
+                                var lamp = document.getElementById("bedroom_2_lamp_1");
+                                var color = lamp.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + lamp.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "on") {
+                                        lamp.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        lamp.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+
+                            //bedroom 2 lamp 2
+                            $("#bedroom_2_lamp_2").click(function(){
+                                var lamp = document.getElementById("bedroom_2_lamp_2");
+                                var color = lamp.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + lamp.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "on") {
+                                        lamp.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        lamp.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+                            //bedroom 2 lamp 2 button
+                            $("#bedroom_2_lamp_2_button").click(function(){
+                                var lamp = document.getElementById("bedroom_2_lamp_2");
+                                var color = lamp.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + lamp.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "on") {
+                                        lamp.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        lamp.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+
+                            //bathroom 2
+                            $("#bathroom_2").click(function(){
+                                var bathroom = document.getElementById("bathroom_2");
+                                var color = bathroom.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + bathroom.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "on") {
+                                        bathroom.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        bathroom.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+                            //bathroom 2 button
+                            $("#bathroom_2_button").click(function(){
+                                var button = document.getElementById("bathroom_2");
+                                var color = button.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + button.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "on") {
+                                        button.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        button.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+
+                            //bathroom 2 window 
+                            $("#bathroom_2_window").click(function(){
+                                var window = document.getElementById("bathroom_2_window");
+                                var color = window.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + window.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "open") {
+                                        window.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        window.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+                            //bathroom 2 window button
+                            $("#bathroom_2_window_button").click(function(){
+                                var button = document.getElementById("bathroom_2_window");
+                                var color = button.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + button.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "open") {
+                                        button.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        button.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+
+                            //bathroom 2 Fan
+                            $("#bathroom_2_fan").click(function(){
+                                var bathroom = document.getElementById("bathroom_2_fan");
+                                var image = bathroom.getAttribute('href');
+                                console.log(image);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + bathroom.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "on") {
+                                        bathroom.setAttribute("href","/static/images/fan_on.svg");
+                                    }else{
+                                        bathroom.setAttribute("href","/static/images/fan.svg");
+                                    }
+                                })();
+                            });
+                            //bathroom 2 fan button
+                            $("#bathroom_2_fan_button").click(function(){
+                                var bathroom = document.getElementById("bathroom_2_fan");
+                                var image = bathroom.getAttribute('href');
+                                console.log(image);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + bathroom.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "on") {
+                                        bathroom.setAttribute("href","/static/images/fan_on.svg");
+                                    }else{
+                                        bathroom.setAttribute("href","/static/images/fan.svg");
+                                    }
+                                })();
+                            });
+                            //master bedroom
+                            $("#master_bedroom").click(function(){
+                                var bedroom = document.getElementById("master_bedroom");
+                                var color = bedroom.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + bedroom.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "on") {
+                                        bedroom.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        bedroom.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+                            //master bedroom button
+                            $("#master_bedroom_button").click(function(){
+                                var bedroom = document.getElementById("master_bedroom");
+                                var color = bedroom.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + bedroom.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "on") {
+                                        bedroom.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        bedroom.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+
+
+                            //master bedroom window 1
+                            $("#master_bedroom_window_1").click(function(){
+                                var window = document.getElementById("master_bedroom_window_1");
+                                var color = window.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + window.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "open") {
+                                        window.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        window.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+                            //master bedroom window 1 button
+                            $("#master_bedroom_window_1_button").click(function(){
+                                var window = document.getElementById("master_bedroom_window_1");
+                                var color = window.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + window.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "open") {
+                                        window.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        window.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+                            //master bedroom window 2
+                            $("#master_bedroom_window_2").click(function(){
+                                var window = document.getElementById("master_bedroom_window_2");
+                                var color = window.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + window.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "open") {
+                                        window.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        window.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+                            //master bedroom window 2 button
+                            $("#master_bedroom_window_2_button").click(function(){
+                                var window = document.getElementById("master_bedroom_window_2");
+                                var color = window.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + window.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "open") {
+                                        window.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        window.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+                            //master bedroom lamp 1
+                            $("#master_bedroom_lamp_1").click(function(){
+                                var lamp = document.getElementById("master_bedroom_lamp_1");
+                                var color = lamp.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + lamp.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "on") {
+                                        lamp.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        lamp.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+                            //master bedroom lamp 1 button
+                            $("#master_bedroom_lamp_1_button").click(function(){
+                                var lamp = document.getElementById("master_bedroom_lamp_1");
+                                var color = lamp.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + lamp.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "on") {
+                                        lamp.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        lamp.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+                            //master bedroom lamp 2
+                            $("#master_bedroom_lamp_2").click(function(){
+                                var lamp = document.getElementById("master_bedroom_lamp_2");
+                                var color = lamp.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + lamp.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "on") {
+                                        lamp.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        lamp.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+                            //master bedroom lamp 2 button
+                            $("#master_bedroom_lamp_2_button").click(function(){
+                                var lamp = document.getElementById("master_bedroom_lamp_2");
+                                var color = lamp.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + lamp.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "on") {
+                                        lamp.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        lamp.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+
+                            //master bedroom tv
+                            $("#master_bedroom_tv").click(function(){
+                                var tv = document.getElementById("master_bedroom_tv");
+                                var color = tv.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + tv.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "on") {
+                                        tv.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        tv.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+                            //master bedroom tv button
+                            $("#master_bedroom_tv_button").click(function(){
+                                var tv = document.getElementById("master_bedroom_tv");
+                                var color = tv.getAttribute('fill');
+                                console.log(color);
+                                (async () => {
+                                    var retval = await fetch('/api/toggle?id=' + tv.id);  
+                                    var obj = await retval.json();  
+                                    if (obj.value == "on") {
+                                        tv.setAttribute("fill","#99c3ea");
+                                    }else{
+                                        tv.setAttribute("fill","white");
+                                    }
+                                })();
+                            });
+
+
+
+
+
+
+
+
+
+                        });
+                    </script>
+                    
+                    <script>
+                        var svg = document.querySelector('svg');
+                        var rect = svg.querySelectorAll('rect');
+                        var rectArray = Array.prototype.slice.call(rect);
+                        rectArray.forEach(function (rect) {
+                            if (rect.id) {
+                                rect.addEventListener('mouseover', function () {
+       
+                                    var name = rect.getAttribute('name');
+                             
+                                    
+                                    document.getElementById('selected').innerHTML = "Selected Item: " + name;
+
+                                    rect.style.stroke = "#FD8469";
+
+
+
+
+                                });
+                                rect.addEventListener('mouseout', function () {
+                                    rect.style.stroke = 'black';
+                                    document.getElementById('selected').innerHTML = "Selected Item: "
+                
+                                });
+                            }
+                        });
+                        var images = svg.querySelectorAll('image');
+                        var imageArray = Array.prototype.slice.call(images);
+                        imageArray.forEach(function (image) {
+                            if (image.id) {
+                                image.addEventListener('mouseover', function () {
+                                    var name = image.getAttribute('name');
+                                    document.getElementById('selected').innerHTML = "Selected Item: " + name;
+                                    image.setAttribute('width', parseInt(image.getAttribute('width')) + 10);
+                                    image.setAttribute('height', parseInt(image.getAttribute('height')) + 10);
+                                    image.setAttribute('x', parseInt(image.getAttribute('x')) - 5);
+                                    image.setAttribute('y', parseInt(image.getAttribute('y')) - 5);
+
+                                });
+                                image.addEventListener('mouseout', function () {
+                                    image.setAttribute('width', parseInt(image.getAttribute('width')) - 10);
+                                    image.setAttribute('height', parseInt(image.getAttribute('height')) - 10);
+                                    image.setAttribute('x', parseInt(image.getAttribute('x')) + 5);
+                                    image.setAttribute('y', parseInt(image.getAttribute('y')) + 5);
+                                    document.getElementById('selected').innerHTML = "Selected Item: "
+                                });
+                            }
+                        });
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <p id= "selected"> Selected Item: </p>
+    </div>
+    
+    <script>
+
+        window.onclick = function(e) {
+            if (!e.target.matches('.dropbtn')) {
+            var myDropdown = document.getElementById("bathroom_drop");
+            var myDropdown2 = document.getElementById("bed_drop");
+            var myDropdown3 = document.getElementById("kitchen_drop");
+            var myDropdown4 = document.getElementById("living_drop");
+            var myDropdown5 = document.getElementById("master_drop");
+            var myDropdown6 = document.getElementById("garage_drop");
+              if (myDropdown.classList.contains('show')) {
+                myDropdown.classList.remove('show');
+              }
+                if (myDropdown2.classList.contains('show')) {
+                    myDropdown2.classList.remove('show');
+                }
+                if (myDropdown3.classList.contains('show')) {
+                    myDropdown3.classList.remove('show');
+                }
+                if (myDropdown4.classList.contains('show')) {
+                    myDropdown4.classList.remove('show');
+                }
+                if (myDropdown5.classList.contains('show')) {
+                    myDropdown5.classList.remove('show');
+                }
+                if (myDropdown6.classList.contains('show')) {
+                    myDropdown6.classList.remove('show');
+                }
+            }
+          }
+
+        function myFunction() {
+            var myDropdown = document.getElementById("bathroom_drop");
+            var myDropdown2 = document.getElementById("bed_drop");
+            var myDropdown3 = document.getElementById("kitchen_drop");
+            var myDropdown4 = document.getElementById("living_drop");
+            var myDropdown5 = document.getElementById("master_drop");
+          document.getElementById("garage_drop").classList.toggle("show");
+            if (myDropdown.classList.contains('show')) {
+                myDropdown.classList.remove('show');
+            }
+            if (myDropdown2.classList.contains('show')) {
+                myDropdown2.classList.remove('show');
+            }
+            if (myDropdown3.classList.contains('show')) {
+                myDropdown3.classList.remove('show');
+            }
+            if (myDropdown4.classList.contains('show')) {
+                myDropdown4.classList.remove('show');
+            }
+            if (myDropdown5.classList.contains('show')) {
+                myDropdown5.classList.remove('show');
+            }
+        }
+
+        function myFunction_2() {
+            var myDropdown = document.getElementById("bathroom_drop");
+            var myDropdown2 = document.getElementById("bed_drop");
+            var myDropdown3 = document.getElementById("garage_drop");
+            var myDropdown4 = document.getElementById("living_drop");
+            var myDropdown5 = document.getElementById("master_drop");
+            document.getElementById("kitchen_drop").classList.toggle("show");
+            if (myDropdown.classList.contains('show')) {
+                myDropdown.classList.remove('show');
+            }
+            if (myDropdown2.classList.contains('show')) {
+                myDropdown2.classList.remove('show');
+            }
+            if (myDropdown3.classList.contains('show')) {
+                myDropdown3.classList.remove('show');
+            }
+            if (myDropdown4.classList.contains('show')) {
+                myDropdown4.classList.remove('show');
+            }
+            if (myDropdown5.classList.contains('show')) {
+                myDropdown5.classList.remove('show');
+            }
+          }
+          
+          function myFunction_3() {
+            var myDropdown = document.getElementById("bathroom_drop");
+            var myDropdown2 = document.getElementById("bed_drop");
+            var myDropdown3 = document.getElementById("garage_drop");
+            var myDropdown4 = document.getElementById("kitchen_drop");
+            var myDropdown5 = document.getElementById("master_drop");
+            document.getElementById("living_drop").classList.toggle("show");
+            if (myDropdown.classList.contains('show')) {
+                myDropdown.classList.remove('show');
+            }
+            if (myDropdown2.classList.contains('show')) {
+                myDropdown2.classList.remove('show');
+            }
+            if (myDropdown3.classList.contains('show')) {
+                myDropdown3.classList.remove('show');
+            }
+            if (myDropdown4.classList.contains('show')) {
+                myDropdown4.classList.remove('show');
+            }
+            if (myDropdown5.classList.contains('show')) {
+                myDropdown5.classList.remove('show');
+            }
+
+          }
+          
+          function myFunction_4() {
+            var myDropdown = document.getElementById("living_drop");
+            var myDropdown2 = document.getElementById("bed_drop");
+            var myDropdown3 = document.getElementById("garage_drop");
+            var myDropdown4 = document.getElementById("kitchen_drop");
+            var myDropdown5 = document.getElementById("master_drop");
+            document.getElementById("bathroom_drop").classList.toggle("show");
+            if (myDropdown.classList.contains('show')) {
+                myDropdown.classList.remove('show');
+            }
+            if (myDropdown2.classList.contains('show')) {
+                myDropdown2.classList.remove('show');
+            }
+            if (myDropdown3.classList.contains('show')) {
+                myDropdown3.classList.remove('show');
+            }
+            if (myDropdown4.classList.contains('show')) {
+                myDropdown4.classList.remove('show');
+            }
+            if (myDropdown5.classList.contains('show')) {
+                myDropdown5.classList.remove('show');
+            }
+          }
+          
+          function myFunction_5() {
+            var myDropdown = document.getElementById("living_drop");
+            var myDropdown2 = document.getElementById("bed_drop");
+            var myDropdown3 = document.getElementById("garage_drop");
+            var myDropdown4 = document.getElementById("kitchen_drop");
+            var myDropdown5 = document.getElementById("bathroom_drop");
+            document.getElementById("master_drop").classList.toggle("show");
+            if (myDropdown.classList.contains('show')) {
+                myDropdown.classList.remove('show');
+            }
+            if (myDropdown2.classList.contains('show')) {
+                myDropdown2.classList.remove('show');
+            }
+            if (myDropdown3.classList.contains('show')) {
+                myDropdown3.classList.remove('show');
+            }
+            if (myDropdown4.classList.contains('show')) {
+                myDropdown4.classList.remove('show');
+            }
+            if (myDropdown5.classList.contains('show')) {
+                myDropdown5.classList.remove('show');
+            }
+          }
+        
+
+          function myFunction_6() {
+            var myDropdown = document.getElementById("living_drop");
+            var myDropdown2 = document.getElementById("master_drop");
+            var myDropdown3 = document.getElementById("garage_drop");
+            var myDropdown4 = document.getElementById("kitchen_drop");
+            var myDropdown5 = document.getElementById("bathroom_drop");
+            document.getElementById("bed_drop").classList.toggle("show");
+            if (myDropdown.classList.contains('show')) {
+                myDropdown.classList.remove('show');
+            }
+            if (myDropdown2.classList.contains('show')) {
+                myDropdown2.classList.remove('show');
+            }
+            if (myDropdown3.classList.contains('show')) {
+                myDropdown3.classList.remove('show');
+            }
+            if (myDropdown4.classList.contains('show')) {
+                myDropdown4.classList.remove('show');
+            }
+            if (myDropdown5.classList.contains('show')) {
+                myDropdown5.classList.remove('show');
+            }
+          }
+
+        </script>
+
+
+   
+
+    <style>
+
+
+
+        .drops {
+            margin-top: 40px;
+            padding: 1rem;
+            background-color: rgba(255,255,255, 0.3);
+            box-shadow: 0 4px 20px rgba(255, 255, 255, 0.25) inset, 0 4px 20px rgba(0, 0, 0, 0.2);
+            border-radius: 1rem;
+            backdrop-filter: blur(50px);
+            display: inline-block;
+            font-family: "Russo One";
+            
+        }
+
+        .drops .dropdown{
+          display: inline-block;
+         
+        }
+
+        
+
+        .drops .dropdown .dropbtn {
+          border-radius: 1rem;
+          background-color: #FD8469;
+          color: white;
+          padding: 16px;
+          font-size: 16px;
+          border: none;
+          cursor: pointer;
+          height: 120px;
+          margin-bottom:5px;
+          
+        }
+
+        
+
+        .drops .dropdown .dropbtn:hover, .drops .dropdown .dropbtn:focus {
+          background-color: #99c3ea;
+          transition: all ease-in-out 270ms;
+        }
+
+                  
+
+        .dropdown-content {
+          border-radius: 1rem;
+          display: none;
+          background-color: #f9f9f9;
+          min-width: 160px;
+          box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+          z-index: 1;
+          transition: opacity 150ms ease-in-out;
+        }
+        
+        .dropdown-content a {
+          float: none;
+          color: black;
+          padding: 12px 16px;
+          text-decoration: none;
+          display: block;
+          text-align: left;
+         
+        }
+        
+        .dropdown-content a:hover {
+          border-radius: 1rem;  
+          background-color: #99c3ea;
+          transition: all ease-in-out 270ms;
+         
+        }
+
+
+        
+
+
+        .show {
+          display: block;
+          transition: all ease-in-out 270ms;
+        }
+        p{
+          font-family: "Russo One";
+        }
+        </style>
+
+        <div class="drops">
+            <div class="dropdown" >
+                <button class="dropbtn" onclick="myFunction()">Garage Items
+                  <i class="fa fa-caret-down"></i>
+                </button>
+                
+            </div>
+    
+            <div class="dropdown">
+                <button class="dropbtn" onclick="myFunction_2()">Kitchen Items
+                  <i class="fa fa-caret-down"></i>
+                </button>
+                
+            </div>
+    
+            <div class="dropdown">
+                <button class="dropbtn" onclick="myFunction_3()">Living Room 
+                  <i class="fa fa-caret-down"></i>
+                </button>
+                
+            </div>
+            <div class="dropdown">
+                <button class="dropbtn" onclick="myFunction_4()">Bathroom Items
+                  <i class="fa fa-caret-down"></i>
+                </button>
+                
+            </div>
+            <div class="dropdown">
+                <button class="dropbtn" onclick="myFunction_5()">Master Bed Items
+                  <i class="fa fa-caret-down"></i>
+                </button>
+                
+            </div>
+            <div class="dropdown">
+                <button class="dropbtn" onclick="myFunction_6()">Bedroom Items
+                  <i class="fa fa-caret-down"></i>
+                </button>
+                
+            </div>
+    
+            <div class="dropdown-content" id="garage_drop">
+                <a id="garage_door_1_button" href="#">Garage Door 1</a>
+                <a id="garage_door_2_button" href="#">Garage Door 2</a>
+                <a id="garage_door_button" href="#">Door to Garage</a>
+                  <a id = "washer_button" href="#">Washer</a>
+                  <a id="dryer_button" href="#">Dryer</a>
+                  <a id="garage_bay_1_button" href="#">Garage 1 Light</a>
+                  <a id="garage_bay_2_button" href="#">Garage 2 Light</a>
+              </div>
+    
+    
+            <div class="dropdown-content" id="kitchen_drop">
+                <a id="backdoor_button" href="#">Back Door</a>
+                <a id="kitchen_win_1_button" href="#">Kitchen Window 1</a>
+                <a id="kitchen_win_2_button" href="#">Kitchen Window 2</a>
+                <a id="dishwasher_button" href="#">Dishwasher</a>
+                  <a id="refrigerator_button" href="#">Refrigerator</a>
+                  <a id="oven_button" href="#">Oven</a>
+                  <a id="microwave_button" href="#">Microwave</a>
+                  <a id="stove_button" href="#">Stove</a>
+                  <a id="kitchen_button" href="#">Kitchen Light</a>
+            </div>
+    
+            <div class="dropdown-content" id="living_drop">
+                <a id="living_win1_button" href="#">Living Room Window 1</a>
+                <a id="living_win2_button" href="#">Living Room Window 2</a>
+                <a id="living_win3_button" href="#">Living Room Window 3</a>
+                <a id= "front_door_button" href="#">Front Door</a>
+                  <a id="living_lamp1_button" href="#">Living Room Lamp 1</a>
+                  <a id="living_lamp2_button" href="#">Living Room Lamp 2</a>
+                  <a id="living_light_button" href="#">Living Room Light</a>
+                  <a id="living_tv_button" href="#">Living Room TV</a>
+            </div>
+            <div class="dropdown-content" id="bathroom_drop">
+                <a id="bathroom_1_window_button" href="#">Master Bath Window </a>
+                <a id="bathroom_1_fan_button" href="#">Master Bath Fan</a>
+                <a id="bathroom_1_button" href="#">Master Bath Light</a>
+                <a id="bathroom_2_window_button" href="#">Bathroom 2 Window</a>
+                  <a id="bathroom_2_fan_button" href="#">Bathroom 2 Fan</a>
+                  <a id="bathroom_2_button" href="#">Bathroom 2 Light</a>
+    
+            </div>
+            <div class="dropdown-content" id="master_drop">
+                <a id="master_bedroom_window_1_button" href="#">Master Bed Window 1 </a>
+                <a id="master_bedroom_window_2_button" href="#">Master Bed Window 2</a>
+                <a id="master_bedroom_lamp_1_button" href="#">Master Bed Lamp 1</a>
+                <a id="master_bedroom_lamp_2_button" href="#">Master Bed Lamp 2</a>
+                  <a id="master_bedroom_button" href="#">Master Bed Light</a>
+                  <a id="master_bedroom_tv_button" href="#">Master Bed TV</a>
+    
+            </div>
+            <div class="dropdown-content" id="bed_drop">
+                <a id="bedroom_1_window_1_button" href="#">Bedroom 1 Window 1 </a>
+                <a id="bedroom_1_window_2_button" href="#">Bedroom 1 Window 2</a>
+                <a id="bedroom_1_lamp_1_button" href="#">Bedroom 1 Lamp 1</a>
+                <a id="bedroom_1_lamp_2_button" href="#">Bedroom 1 Lamp 2</a>
+                  <a id="bedroom_1_button" href="#">Bedroom 1 Light</a>
+                  <a id="bedroom_2_window_1_button" href="#">Bedroom 2 Window 1 </a>
+                <a id="bedroom_2_window_2_button" href="#">Bedroom 2 Window 2</a>
+                <a id="bedroom_2_lamp_1_button" href="#">Bedroom 2 Lamp 1</a>
+                <a id="bedroom_2_lamp_2_button" href="#">Bedroom 2 Lamp 2</a>
+                  <a id="bedroom_2_button" href="#">Bedroom 2 Light</a>
+    
+            </div>
+    
+                
+        </div>
+
+    
+    {% for item in data %}  
+  
+
+    {%if data[item] == "on" %}
+    {%if item == "Hallway" %}
+    {%elif item == "bathroom_1_fan" or item == "bathroom_2_fan"%}
+        <script>
+            var obj = document.getElementById("{{item}}");
+            obj.setAttribute("href","/static/images/fan_on.svg");
+        </script>
+
+    {% else %}
+
+    <script>
+        var obj = document.getElementById("{{item}}");
+        obj.setAttribute("fill","#99c3ea");
+
+    </script>
+
+    {% endif %}
+    {% endif %}
+
+
+    {% if data[item] == "open" %}
+    {%if item == "front_door" or item == "backdoor" or item == "garagedoor" or item == "garagedoor_1" or item == "garagedoor_2"%}
+
+    <script>
+        var obj = document.getElementById("{{item}}");
+        var x = obj.getAttribute('x');
+        var y = obj.getAttribute('y');
+        obj.setAttribute("fill","#99c3ea");
+        obj.setAttribute("transform", "rotate(90 " + x +',' + y + ") scale(1)");
+    </script>
+    {%else%}
+    <script>
+        var obj = document.getElementById("{{item}}");
+        obj.setAttribute("fill","#99c3ea");
+    </script>
+
+    {%endif%}
+
+    {% endif %}
+
+
+
+
+    
+    {% endfor %}
+    
+    </div>
+    <div id="footer">
+        <p class = "translate" class="mt-5 mb-3 text-muted" id="google_translate_element">&copy; 2022</p>
+    </div>
+    <script type="text/javascript">
+        window.onload = function() {
+            
+            console.log("i ran");
+            inner = document.getElementById('int_reading')
+            therm = document.getElementById('therm_temp')
+    
+    
+            //heating
+            if ( parseInt(inner.textContent) < parseInt(therm.textContent)) {
+                document.body.style.background = 'linear-gradient(150.89deg, #FD8469, #FD8469)'
+                document.body.style.backgroundAttachment = "fixed"
+            }
+            //cooling
+            else if(parseInt(inner.textContent) > parseInt(therm.textContent)) {
+               document.body.style.background = 'linear-gradient(150.89deg, #99c3ea, #99c3ea)'
+                document.body.style.backgroundAttachment = "fixed"
+            }
+            //set 
+            else{
+                document.body.style.background = 'linear-gradient(150.89deg, #99c3ea, #FD8469)'
+                document.body.style.backgroundAttachment = "fixed"
+            } 
+        };
+    </script>
+
+ {% endblock %}

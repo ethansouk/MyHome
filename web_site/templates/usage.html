@@ -1,0 +1,243 @@
+{% extends 'layout.html' %} {% block body %}
+<script
+src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js">
+
+</script>
+<div id="indexPage" class="mb-4">
+
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title" id ="usage-title">Yearly Usage</h3>
+                </div>
+                <div class="card-body">
+                    <div class="chart" id= "chart">
+      
+
+
+                        <canvas id="myChart" style="width:100%;max-width:1000px" ></canvas>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <style>
+
+
+              
+
+    .dropdown-content {
+      display: block;
+      background-color: #f9f9f9;
+      height: 60px;
+      z-index: 1;
+      border-radius: 1rem;
+    }
+    
+    .dropdown-content button {
+        background-color: #FD8469;
+        color: white;
+        padding: 0px 0px;
+        font-size: 16px;
+        border: none;
+        cursor: pointer;
+        width: 110px;
+        height: 50px;
+        display: inline-block;
+        text-align: center;
+        border-radius: 0.5rem;
+        font-family: "Russo One";
+    }
+    
+    .dropdown-content button:hover {
+      background-color: #99c3ea;
+      transition: all ease-in-out 240ms;
+    }
+
+    .chart{
+        display: block;
+    }
+
+    
+
+    </style>
+
+
+    <div class="dropdown-content" id="graph_drop">
+        <button onclick="yearly()" >Display Yearly Totals</button>
+        <button onclick="week()">Display Last Week Totals</button>
+        <select id="mode">
+          <option value="water">Water</option>
+          <option value="electricity">Electricity</option>
+        </select>
+
+      </div>
+
+    <script>
+        
+
+        function yearly(){
+          var title = document.getElementById("usage-title");
+            title.innerHTML = "Yearly Usage ";
+            (async () => {
+              var retval = await fetch('/getusagedata?start=2021-12-01&end=2022-12-31');  
+              var obj = await retval.json();  
+              start = Object.keys(obj["cost_electricity"])[0];
+              end = Object.keys(obj["cost_electricity"]).slice(-1)[0];
+              lbls = month_labels(start, end)
+              draw_chart(obj, lbls);  
+          })();
+            
+        }
+
+        function week(){
+            var title = document.getElementById("usage-title");
+            title.innerHTML = "Weekly Usage ";
+            (async () => {
+              var retval = await fetch('/getusagedata?start=2022-11-28&end=2022-12-04');  
+              var obj = await retval.json();  
+              lbls = []
+
+              var mode = document.getElementById("mode").value;
+              if (mode == "water"){
+                Object.keys(obj["cost_water"]).forEach(i => lbls.push(i))
+              }
+              else{
+                Object.keys(obj["cost_electricity"]).forEach(i => lbls.push(i))
+              }
+              
+                  
+              
+              console.log(lbls)
+              
+              draw_chart(obj,lbls);  
+          })();
+        }
+
+        var months = [ "Jan", "Feb", "Mar", "Apr", "May", "Jun","Jul", "Aug", "Sep", "Oct", "Nov", "Dec" ];
+
+        function month_labels(start, end) {
+            var retval = [];
+            var dateStart = new Date(start);
+            var dateEnd = new Date(end);
+            var yearStart =  dateStart.getFullYear();
+            var yearEnd =  dateEnd.getFullYear();
+            var yearDiff = (12 * (yearEnd - yearStart)) + dateEnd.getMonth();
+            for (var i = dateStart.getMonth(); i <= yearDiff; i++) {
+                retval.push(months[i%12] + " " + Math.floor(yearStart+(i/12)));
+            }        
+            return retval;
+        }
+
+        var myChart;
+
+        function draw_chart(data, labels){
+
+        if (myChart !== undefined) {
+            while (myChart.data.datasets.length > 0) {
+              myChart.data.datasets.pop();
+            }
+          }
+        
+      
+        var mode = document.getElementById("mode").value;  
+        if(mode == "water"){
+          myChart = new Chart("myChart", {
+            type: "line",
+            data: {
+              labels: labels,
+              datasets: [
+              {
+                  fill: false,
+                  lineTension: 0,
+                    label: "Cost Water",
+                  backgroundColor: "blue",
+                  borderColor: "blue",
+                  borderDash: [10,5],
+                  data: Object.values(data["cost_water"])
+              },
+              {
+                  fill: false,
+                  lineTension: 0,
+                    label: "Water Usage",
+                  backgroundColor: "blue",
+                  borderColor: "blue",
+                  data: Object.values(data["usage_water"])
+              }
+                
+                
+                ]
+            },
+            options: {
+              legend: {display: true, position: 'bottom', labels: {fontColor: 'black', fontSize: 16} },
+              scales: {
+                yAxes: [{ticks: {min: 0}}],
+              }
+            }
+  
+  
+            
+          });
+
+        }
+        else{
+          myChart = new Chart("myChart", {
+            type: "line",
+            data: {
+              labels: labels,
+              datasets: [
+              {
+                  fill: false,
+                  lineTension: 0,
+                    label: "Cost Electricity",
+                  backgroundColor: "green",
+                  borderColor: "green",
+                  borderDash: [10,5],
+                  data: Object.values(data["cost_electricity"])
+              },
+              {
+                  fill: false,
+                  lineTension: 0,
+                    label: "Electricity Usage",
+                  backgroundColor: "green",
+                  borderColor: "green",
+                  data: Object.values(data["usage_electricity"])
+              },              
+                ]
+            },
+            options: {
+              legend: {display: true, position: 'bottom', labels: {fontColor: 'black', fontSize: 16} },
+              scales: {
+                yAxes: [{ticks: {min: 0}}],
+              }
+            }
+  
+  
+            
+          });
+
+        }
+
+        
+
+        
+    }   
+
+        </script>
+
+        <script>
+            window.onload = function() {
+            
+              yearly();
+          };
+            
+            </script>
+
+    <p class="mt-5 mb-3 text-muted" id="google_translate_element">&copy; 2022</p>
+</div> {% endblock %}

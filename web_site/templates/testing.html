@@ -1,0 +1,53 @@
+{% extends 'layout.html' %} {% block body %}
+<div id="indexPage" class="mb-4">
+    <h1 class="h3 border-bottom mb-4">Testing Screen</h1>
+
+    <style>
+        h1{
+            font-family: "Russo One";
+            color: white;
+        }
+        #Thurm {
+            margin: 0;
+            padding: 0;
+        }
+        #Thurm .card {
+            display: inline-block;
+        }
+        .mybtn{
+            background-color: #FD8469;
+            color: white;
+            padding: 14px 20px;
+            margin: 8px 0;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            border-radius: 1rem;
+            font-family: "Russo One";
+        }
+        .mybtn:hover{
+            background-color: #99c3ea;
+            transition: all ease-in-out 240ms;
+        }
+    </style>
+    <div id = "Thurm">
+        <div class="card mb-4 shadow-sm">
+            <div class="card-body">
+                <h2 class="card-title">Test 1</h2>
+                <p class="card-text">This test will simulate running the oven 5 times today.</p>
+                <button class="mybtn" onclick= "location.href='{{ url_for('test1') }}';">Run Test</button>
+            </div>
+        </div>
+
+        <div class="card mb-4 shadow-sm">
+            <div class="card-body">
+                <h2 class="card-title">Test 2</h2>
+                <p class="card-text">This test will simulate running the washer 5 times today.</p>
+                <button class="mybtn"  onclick="location.href='{{ url_for('test2') }}';">Run Test</button>
+                
+            </div>
+        </div>
+    </div>
+
+    <p class="mt-5 mb-3 text-muted" id="google_translate_element">&copy; 2022</p>
+</div> {% endblock %}
